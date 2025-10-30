@@ -1,0 +1,283 @@
+# Supabase Configuration
+# https://supabase.com/docs/guides/cli/config
+
+[project]
+name = "wanwa"
+org_id = "cirquephotovideo"
+
+[api]
+port = 54321
+schemas = ["public", "storage", "auth"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 15
+
+[studio]
+port = 54323
+
+[auth]
+enabled = true
+site_url = "http://localhost:5173"
+additional_redirect_urls = ["http://localhost:5173"]
+jwt_expiry = 3600
+enable_signup = true
+enable_anonymous_sign_ins = false
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false
+
+# Edge Functions Configuration
+# Cron jobs for automated tasks
+
+# ==========================================
+# IMPORT FUNCTIONS
+# ==========================================
+
+[functions.email-imap-scheduler]
+verify_jwt = true
+cron = "*/15 * * * *"  # Every 15 minutes
+description = "Poll IMAP servers for supplier emails"
+
+[functions.email-imap-poller]
+verify_jwt = true
+description = "Fetch and process supplier emails from IMAP"
+
+[functions.process-email-attachment]
+verify_jwt = true
+description = "Parse CSV/Excel attachments from emails"
+
+[functions.email-import-chunk]
+verify_jwt = true
+description = "Bulk insert products from email import"
+
+[functions.supplier-sync-scheduler]
+verify_jwt = true
+cron = "*/30 * * * *"  # Every 30 minutes
+description = "Schedule FTP/API sync for all suppliers"
+
+[functions.supplier-sync-ftp]
+verify_jwt = true
+description = "Sync products from supplier FTP/SFTP"
+
+[functions.supplier-import-csv]
+verify_jwt = true
+description = "Import products from uploaded CSV file"
+
+[functions.import-from-platform]
+verify_jwt = true
+description = "Import products from e-commerce platforms"
+
+# ==========================================
+# ENRICHMENT FUNCTIONS
+# ==========================================
+
+[functions.process-enrichment-queue]
+verify_jwt = false  # System cron job
+cron = "*/2 * * * *"  # Every 2 minutes
+description = "Process enrichment queue items"
+
+[functions.enrich-all]
+verify_jwt = true
+description = "Enrich product with all available sources"
+
+[functions.amazon-product-search]
+verify_jwt = true
+description = "Search product on Amazon using SP-API"
+
+[functions.enrich-supplier-product-web]
+verify_jwt = true
+description = "Enrich product with web scraping"
+
+[functions.enrich-specifications]
+verify_jwt = true
+description = "Generate technical specifications using AI"
+
+[functions.rsgp-compliance-generator]
+verify_jwt = true
+description = "Generate RSGP compliance documentation"
+
+[functions.enrich-product-images]
+verify_jwt = true
+description = "Download and process product images"
+
+[functions.check-enrichment-queue-stuck]
+verify_jwt = false  # System cron job
+cron = "*/30 * * * *"  # Every 30 minutes
+description = "Check for stuck enrichment jobs"
+
+# ==========================================
+# AMAZON SP-API OAUTH
+# ==========================================
+
+[functions.amazon-oauth-start]
+verify_jwt = false  # Public endpoint for OAuth flow
+description = "Initiate Amazon SP-API OAuth flow"
+
+[functions.amazon-oauth-callback]
+verify_jwt = false  # Public endpoint for OAuth callback
+description = "Handle Amazon SP-API OAuth callback"
+
+[functions.amazon-token-manager]
+verify_jwt = false  # System cron job
+cron = "0 4 * * *"  # Daily at 4 AM
+description = "Refresh Amazon SP-API access tokens"
+
+[functions.rotate-amazon-credentials]
+verify_jwt = false  # System cron job
+cron = "0 4 * * *"  # Daily at 4 AM
+description = "Rotate Amazon credentials before expiry"
+
+[functions.check-amazon-credentials-expiry]
+verify_jwt = false  # System cron job
+cron = "0 */6 * * *"  # Every 6 hours
+description = "Check and alert for expiring Amazon credentials"
+
+[functions.get-amazon-marketplace-participations]
+verify_jwt = true
+description = "Fetch user's Amazon marketplace participations"
+
+# ==========================================
+# EXPORT FUNCTIONS
+# ==========================================
+
+[functions.auto-export-manager]
+verify_jwt = false  # System cron job
+cron = "0 * * * *"  # Every hour
+description = "Automatically export products based on rules"
+
+[functions.export-to-odoo]
+verify_jwt = true
+description = "Export products to Odoo ERP"
+
+[functions.export-to-shopify]
+verify_jwt = true
+description = "Export products to Shopify"
+
+[functions.export-to-prestashop]
+verify_jwt = true
+description = "Export products to PrestaShop"
+
+[functions.export-to-woocommerce]
+verify_jwt = true
+description = "Export products to WooCommerce"
+
+[functions.export-to-magento]
+verify_jwt = true
+description = "Export products to Magento"
+
+[functions.export-single-product]
+verify_jwt = true
+description = "Export single product to specified platform"
+
+[functions.export-bulk-products]
+verify_jwt = true
+description = "Export multiple products in bulk"
+
+[functions.sync-platform-orders]
+verify_jwt = false  # System cron job
+cron = "*/15 * * * *"  # Every 15 minutes
+description = "Sync orders from connected platforms"
+
+# ==========================================
+# AI & CHAT FUNCTIONS
+# ==========================================
+
+[functions.product-chat]
+verify_jwt = true
+description = "Chat with AI about specific product"
+
+[functions.build-product-chat-context]
+verify_jwt = true
+description = "Build context for product chat"
+
+[functions.ai-chat]
+verify_jwt = true
+description = "General AI chat assistant"
+
+[functions.ollama-proxy]
+verify_jwt = true
+description = "Proxy requests to local Ollama instance"
+
+[functions.claude-proxy]
+verify_jwt = true
+description = "Proxy requests to Claude API"
+
+[functions.openai-proxy]
+verify_jwt = true
+description = "Proxy requests to OpenAI API"
+
+# ==========================================
+# MONITORING & LOGS
+# ==========================================
+
+[functions.get-import-stats]
+verify_jwt = true
+description = "Get import statistics and metrics"
+
+[functions.get-enrichment-stats]
+verify_jwt = true
+description = "Get enrichment statistics"
+
+[functions.get-amazon-logs]
+verify_jwt = true
+description = "Retrieve Amazon SP-API logs"
+
+[functions.run-system-tests]
+verify_jwt = true
+description = "Run comprehensive system health tests"
+
+[functions.send-notification]
+verify_jwt = false  # System function
+description = "Send email/SMS notifications"
+
+# ==========================================
+# MAINTENANCE
+# ==========================================
+
+[functions.cleanup-old-emails]
+verify_jwt = false  # System cron job
+cron = "0 3 * * *"  # Daily at 3 AM
+description = "Clean up emails older than 90 days"
+
+[functions.cleanup-failed-enrichments]
+verify_jwt = false  # System cron job
+cron = "0 2 * * *"  # Daily at 2 AM
+description = "Clean up failed enrichment queue items"
+
+[functions.optimize-database]
+verify_jwt = false  # System cron job
+cron = "0 1 * * 0"  # Weekly on Sunday at 1 AM
+description = "Optimize database tables and indexes"
+
+# ==========================================
+# PAYMENTS & SUBSCRIPTIONS
+# ==========================================
+
+[functions.stripe-webhook-handler]
+verify_jwt = false  # Public webhook endpoint
+description = "Handle Stripe webhook events"
+
+[functions.check-subscription-status]
+verify_jwt = true
+description = "Check user subscription status"
+
+[functions.update-subscription]
+verify_jwt = true
+description = "Update user subscription plan"
+
+# ==========================================
+# ADMIN & TESTING
+# ==========================================
+
+[functions.edge-function-tester]
+verify_jwt = true
+description = "Test edge functions from admin panel"
+
+[functions.seed-demo-data]
+verify_jwt = true
+description = "Seed database with demo data"
