@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wanwa - Health Check</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .status {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .status-icon {
+      font-size: 80px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    h1 {
+      color: #2d3748;
+      margin: 20px 0;
+      font-size: 32px;
+    }
+
+    .health-status {
+      color: #48bb78;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .metrics {
+      margin-top: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 20px;
+    }
+
+    .metric {
+      background: #f7fafc;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .metric-label {
+      color: #718096;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      color: #2d3748;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .metric-value.success {
+      color: #48bb78;
+    }
+
+    .metric-value.warning {
+      color: #ed8936;
+    }
+
+    .metric-value.error {
+      color: #f56565;
+    }
+
+    .info {
+      margin-top: 30px;
+      padding: 20px;
+      background: #edf2f7;
+      border-radius: 10px;
+      font-size: 14px;
+      color: #4a5568;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #cbd5e0;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      font-weight: 600;
+    }
+
+    .timestamp {
+      text-align: center;
+      margin-top: 20px;
+      color: #a0aec0;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="status">
+      <div class="status-icon">✅</div>
+      <h1>Wanwa</h1>
+      <div class="health-status" id="status">System Healthy</div>
+    </div>
+
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-label">Application</div>
+        <div class="metric-value success" id="app-status">●</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Uptime</div>
+        <div class="metric-value" id="uptime">--</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Response Time</div>
+        <div class="metric-value" id="response-time">--</div>
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="info-row">
+        <span class="info-label">Environment:</span>
+        <span id="environment">Production</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Version:</span>
+        <span id="version">latest</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Node Version:</span>
+        <span id="node-version">18.x</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Platform:</span>
+        <span>Coolify / Docker</span>
+      </div>
+    </div>
+
+    <div class="timestamp">
+      Last checked: <span id="timestamp">--</span>
+    </div>
+  </div>
+
+  <script>
+    // Update timestamp
+    function updateTimestamp() {
+      const now = new Date();
+      document.getElementById('timestamp').textContent = now.toLocaleString();
+    }
+
+    // Fetch health data
+    async function checkHealth() {
+      const startTime = performance.now();
+
+      try {
+        // Check main app
+        const response = await fetch('/');
+        const endTime = performance.now();
+        const responseTime = Math.round(endTime - startTime);
+
+        if (response.ok) {
+          document.getElementById('app-status').textContent = '●';
+          document.getElementById('app-status').className = 'metric-value success';
+          document.getElementById('status').textContent = 'System Healthy';
+          document.getElementById('response-time').textContent = responseTime + 'ms';
+
+          // Set response time color based on value
+          const rtElement = document.getElementById('response-time');
+          if (responseTime < 200) {
+            rtElement.className = 'metric-value success';
+          } else if (responseTime < 500) {
+            rtElement.className = 'metric-value warning';
+          } else {
+            rtElement.className = 'metric-value error';
+          }
+        } else {
+          throw new Error('App not responding');
+        }
+      } catch (error) {
+        document.getElementById('app-status').textContent = '●';
+        document.getElementById('app-status').className = 'metric-value error';
+        document.getElementById('status').textContent = 'System Degraded';
+        document.getElementById('status').style.color = '#f56565';
+      }
+
+      updateTimestamp();
+    }
+
+    // Calculate uptime (mock - would come from server in real app)
+    function updateUptime() {
+      const uptimeSeconds = Math.floor((Date.now() - startTime) / 1000);
+      const hours = Math.floor(uptimeSeconds / 3600);
+      const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+      const seconds = uptimeSeconds % 60;
+
+      let uptimeStr = '';
+      if (hours > 0) uptimeStr += hours + 'h ';
+      if (minutes > 0 || hours > 0) uptimeStr += minutes + 'm ';
+      uptimeStr += seconds + 's';
+
+      document.getElementById('uptime').textContent = uptimeStr;
+    }
+
+    // Get environment info from window location
+    const isLocalhost = window.location.hostname === 'localhost';
+    document.getElementById('environment').textContent = isLocalhost ? 'Development' : 'Production';
+
+    // Start time for uptime calculation
+    const startTime = Date.now();
+
+    // Initial check
+    checkHealth();
+    updateUptime();
+
+    // Periodic checks
+    setInterval(checkHealth, 30000); // Every 30 seconds
+    setInterval(updateUptime, 1000); // Every second
+  </script>
+</body>
+</html>

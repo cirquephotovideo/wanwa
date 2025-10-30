@@ -1,0 +1,109 @@
+version: '3.8'
+
+# Optimized Docker Compose for Coolify deployment
+# This configuration is specifically designed for Coolify on Hostinger KVM
+
+services:
+  # Main Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=production
+    image: wanwa:${VERSION:-latest}
+    container_name: wanwa-app
+    restart: unless-stopped
+
+    # Environment variables (set in Coolify)
+    environment:
+      - NODE_ENV=production
+      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+      - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - SUPABASE_PROJECT_ID=${SUPABASE_PROJECT_ID}
+      - AMAZON_CLIENT_ID=${AMAZON_CLIENT_ID}
+      - AMAZON_CLIENT_SECRET=${AMAZON_CLIENT_SECRET}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - FRONTEND_URL=${FRONTEND_URL}
+
+    # Ports
+    ports:
+      - "${PORT:-3000}:80"
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # Volumes for persistent data
+    volumes:
+      - app-logs:/var/log/nginx
+      - app-cache:/var/cache/nginx
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Networks
+    networks:
+      - coolify
+
+  # Redis for caching (optional but recommended)
+  redis:
+    image: redis:7-alpine
+    container_name: wanwa-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-wanwa_redis_pass}
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    networks:
+      - coolify
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+# Volumes
+volumes:
+  app-logs:
+    driver: local
+  app-cache:
+    driver: local
+  redis-data:
+    driver: local
+
+# Networks
+networks:
+  coolify:
+    driver: bridge
+
+# Metadata
+labels:
+  - "com.coolify.managed=true"
+  - "com.coolify.application=wanwa"
+  - "com.coolify.version=${VERSION:-latest}"
