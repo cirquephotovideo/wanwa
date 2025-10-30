@@ -1,0 +1,226 @@
+# Coolify Configuration for Wanwa
+# This file tells Coolify how to deploy and manage the application
+
+version: "1.0"
+
+# Application metadata
+metadata:
+  name: wanwa
+  description: "Système de Gestion et Enrichissement de Catalogue Produits"
+  repository: https://github.com/cirquephotovideo/wanwa
+  icon: 📦
+
+# Build configuration
+build:
+  dockerfile: Dockerfile
+  context: .
+  args:
+    NODE_ENV: production
+
+  # Build-time variables
+  buildArgs:
+    - NODE_VERSION=18
+
+  # Cache configuration
+  cache:
+    enabled: true
+    from: wanwa-cache
+
+# Deployment configuration
+deploy:
+  # Deployment strategy
+  strategy: rolling
+  replicas: 1
+
+  # Port mapping
+  ports:
+    - port: 80
+      protocol: http
+      public: true
+
+  # Health check endpoint
+  healthcheck:
+    path: /health
+    port: 80
+    interval: 30s
+    timeout: 10s
+    retries: 3
+    startPeriod: 40s
+
+  # Resource limits
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+
+  # Auto-scaling (optional)
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPU: 80
+    targetMemory: 80
+
+# Environment configuration
+environment:
+  # Required variables
+  required:
+    - VITE_SUPABASE_URL
+    - VITE_SUPABASE_ANON_KEY
+    - SUPABASE_SERVICE_ROLE_KEY
+    - SUPABASE_PROJECT_ID
+    - FRONTEND_URL
+
+  # Optional variables
+  optional:
+    - AMAZON_CLIENT_ID
+    - AMAZON_CLIENT_SECRET
+    - GEMINI_API_KEY
+    - OPENAI_API_KEY
+    - ANTHROPIC_API_KEY
+    - REDIS_PASSWORD
+    - SENTRY_DSN
+    - LOG_LEVEL
+
+# Persistent storage
+volumes:
+  - name: logs
+    path: /var/log/nginx
+    size: 1Gi
+  - name: cache
+    path: /var/cache/nginx
+    size: 512Mi
+
+# Domain configuration
+domains:
+  - domain: ${DOMAIN}
+    https: true
+    redirect_www: true
+    certificate:
+      provider: letsencrypt
+      email: ${ADMIN_EMAIL}
+
+# Pre-deployment commands
+predeploy:
+  - echo "Starting deployment of Wanwa ${VERSION}"
+  - echo "Checking environment variables..."
+
+# Post-deployment commands
+postdeploy:
+  - echo "Deployment completed successfully!"
+  - echo "Running post-deploy scripts..."
+  - ./scripts/post-deploy.sh
+
+# Backup configuration
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention: 7  # Keep 7 days of backups
+  volumes:
+    - logs
+    - cache
+
+# Monitoring configuration
+monitoring:
+  enabled: true
+  metrics:
+    - cpu
+    - memory
+    - network
+    - disk
+  alerts:
+    - type: cpu
+      threshold: 80
+      duration: 5m
+    - type: memory
+      threshold: 85
+      duration: 5m
+    - type: health
+      threshold: down
+      duration: 2m
+
+# Logging configuration
+logging:
+  driver: json-file
+  maxSize: 10m
+  maxFiles: 3
+  compress: true
+
+# Restart policy
+restart:
+  policy: unless-stopped
+  maxRetries: 3
+  delay: 10s
+
+# Services dependencies (if using docker-compose)
+services:
+  - name: redis
+    image: redis:7-alpine
+    port: 6379
+    required: false
+    healthcheck: redis-cli ping
+
+# Webhooks
+webhooks:
+  # GitHub webhook for auto-deploy
+  github:
+    enabled: true
+    branch: main
+    autoDeploy: true
+
+  # Deployment notifications
+  notifications:
+    slack:
+      enabled: ${SLACK_WEBHOOK_ENABLED:-false}
+      webhook: ${SLACK_WEBHOOK_URL}
+    email:
+      enabled: ${EMAIL_NOTIFICATIONS_ENABLED:-false}
+      to: ${ADMIN_EMAIL}
+
+# Security
+security:
+  # SSL/TLS
+  ssl:
+    enabled: true
+    provider: letsencrypt
+    force: true
+
+  # Firewall rules
+  firewall:
+    enabled: true
+    allowedPorts:
+      - 80
+      - 443
+
+  # Rate limiting
+  rateLimit:
+    enabled: true
+    requestsPerMinute: 100
+
+# Custom labels
+labels:
+  app: wanwa
+  environment: ${ENVIRONMENT:-production}
+  managed-by: coolify
+  version: ${VERSION:-latest}
+
+# Notes for deployment
+notes: |
+  Wanwa - Product Catalog Management System
+
+  Required setup:
+  1. Set all required environment variables in Coolify
+  2. Configure domain and SSL certificate
+  3. Ensure Supabase project is created and configured
+  4. Run migrations: ./scripts/migrate.sh
+  5. Deploy Edge Functions: supabase functions deploy
+
+  Post-deployment:
+  - Access the app at: https://${DOMAIN}
+  - Health check: https://${DOMAIN}/health
+  - Admin panel: https://${DOMAIN}/admin
+
+  Support: https://github.com/cirquephotovideo/wanwa/issues
