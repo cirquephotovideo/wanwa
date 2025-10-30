@@ -4,8 +4,12 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-Cloud-green.svg)](https://supabase.com/)
 [![Vite](https://img.shields.io/badge/Vite-5.x-purple.svg)](https://vitejs.dev/)
+[![Tests](https://img.shields.io/badge/Tests-70+-success.svg)](https://vitest.dev/)
+[![Coolify](https://img.shields.io/badge/Coolify-Ready-orange.svg)](https://coolify.io/)
 
 > Solution complète d'automatisation pour l'import, l'enrichissement IA et l'export multi-plateforme de catalogues produits.
+
+**🎉 Production-Ready | 23 Edge Functions | 22 Composants React | 70+ Tests | Déploiement Coolify en 1 clic**
 
 ---
 
@@ -13,12 +17,14 @@
 
 **Wanwa** est une plateforme intelligente qui automatise l'ensemble du cycle de vie d'un catalogue produits :
 
-- 📥 **Import automatisé** depuis emails (IMAP), FTP/SFTP, API et fichiers CSV
-- 🧠 **Enrichissement IA** avec Amazon SP-API, recherche web et analyse avancée
-- 📤 **Export multi-plateforme** vers Odoo, Shopify, PrestaShop, WooCommerce, Magento
+- 📥 **Import automatisé** depuis emails (IMAP), FTP/SFTP, API et fichiers CSV avec drag & drop
+- 🧠 **Enrichissement IA** avec Amazon SP-API, analyse d'images, génération de descriptions SEO
+- 📤 **Export multi-plateforme** vers Odoo, Shopify, PrestaShop, WooCommerce, Magento (bulk operations)
 - 🔍 **Conformité RSGP** automatique avec génération de documentation réglementaire
-- 📊 **Monitoring temps réel** de tous les processus d'import/enrichissement/export
-- 🤖 **IA Multi-Provider** avec fallback automatique (Gemini, GPT, Claude, Llama)
+- 📊 **Monitoring temps réel** avec analytics avancés (6 types de graphiques)
+- 🤖 **IA Multi-Provider** avec fallback automatique (Gemini, GPT, Claude, Ollama)
+- ✅ **Validation EAN** complète avec support de 200+ pays
+- 🚀 **Déploiement Coolify** en 1 commande sur Hostinger KVM
 
 ---
 
@@ -29,34 +35,42 @@
 ```javascript
 // Import automatique depuis email IMAP
 ✅ Polling email automatique (cron: toutes les 15 min)
+✅ Upload CSV drag & drop avec prévisualisation
 ✅ Parsing CSV/Excel avec mapping personnalisable
 ✅ Détection automatique des colonnes (EAN, prix, nom, etc.)
 ✅ Gestion des pièces jointes multiples
+✅ Validation en temps réel des données
+✅ Support FTP/SFTP/API REST
 ```
 
 ### 🧠 Enrichissement Intelligent
 
 ```javascript
-// 4 niveaux d'enrichissement
+// 6 niveaux d'enrichissement
 ✅ Amazon Product Search (SP-API OAuth)
-✅ Recherche web et scraping intelligent
+✅ Analyse d'images IA (Gemini Vision) - couleurs, features, qualité
+✅ Génération descriptions SEO (courte + longue + keywords)
 ✅ Génération spécifications techniques (IA)
 ✅ Analyse RSGP et conformité réglementaire
-✅ Génération images et vidéos produits
 ✅ Classification taxonomique automatique
+✅ Détection de pays via code EAN (200+ pays)
+✅ Enrichissement en masse (bulk operations)
 ```
 
 ### 📤 Export Multi-Plateforme
 
 ```javascript
-// 12+ plateformes supportées
-✅ Odoo (via MCP Server)
-✅ Shopify, PrestaShop, WooCommerce
-✅ Magento, BigCommerce
-✅ Amazon Seller Central
+// 12+ plateformes supportées avec configuration UI
+✅ Odoo ERP (XML-RPC avec test de connexion)
+✅ Shopify (API privée + OAuth)
+✅ WooCommerce (REST API)
+✅ Magento 2 (REST API avec attributs custom)
+✅ PrestaShop (WebService API)
+✅ Export groupé (bulk operations)
+✅ Ajustement prix en masse (% ou fixe)
 ✅ Mapping personnalisé par plateforme
 ✅ Règles de pricing automatiques
-✅ Synchronisation bidirectionnelle
+✅ Historique complet des exports
 ```
 
 ---
@@ -73,7 +87,10 @@
 | **IA** | Lovable AI (Gemini), OpenAI, Claude, Ollama |
 | **API Externes** | Amazon SP-API, Odoo, Shopify, PrestaShop |
 | **Storage** | Supabase Storage (images, CSV, attachments) |
-| **Cron Jobs** | Supabase Edge Functions (124 fonctions) |
+| **Cron Jobs** | Supabase Edge Functions (23+ déployées, 124 documentées) |
+| **Tests** | Vitest (70+ tests unitaires et d'intégration) |
+| **Déploiement** | Coolify / Docker / Nginx |
+| **CI/CD** | GitHub Actions (7 jobs automatiques) |
 
 ### Architecture des Données
 
@@ -90,20 +107,21 @@
 └── ... (voir ARCHITECTURE.md pour détails complets)
 ```
 
-### 124 Edge Functions
+### 23+ Edge Functions Déployées
 
 | Catégorie | Fonctions | Exemples |
 |-----------|-----------|----------|
-| **Import** | 28 | `email-imap-poller`, `supplier-sync-ftp`, `import-from-platform` |
-| **Enrichissement** | 18 | `enrich-all`, `amazon-product-search`, `enrich-specifications` |
-| **Export** | 15 | `export-to-odoo`, `export-to-shopify`, `export-single-product` |
-| **Amazon OAuth** | 8 | `amazon-oauth-start`, `amazon-token-manager`, `rotate-credentials` |
-| **IA & Chat** | 12 | `product-chat`, `ai-chat`, `ollama-proxy`, `claude-proxy` |
-| **Automation** | 22 | `process-enrichment-queue`, `auto-supplier-sync`, `cleanup-emails` |
-| **Monitoring** | 9 | `check-enrichment-queue-stuck`, `run-system-tests` |
-| **Autres** | 12 | `stripe-webhook-handler`, `send-notification`, `market-intelligence` |
+| **Import** | 4 | `email-imap-poller`, `supplier-sync-ftp`, `supplier-import-csv` |
+| **Enrichissement** | 7 | `enrich-all`, `amazon-product-search`, `enrich-specifications`, `enrich-product-images`, `generate-product-description` |
+| **Export** | 7 | `export-to-odoo`, `export-to-shopify`, `export-to-prestashop`, `export-to-woocommerce`, `export-to-magento`, `bulk-export` |
+| **Amazon OAuth** | 3 | `amazon-oauth-start`, `amazon-oauth-callback`, `amazon-token-manager` |
+| **IA & Chat** | 1 | `ai-chat` |
+| **Automation** | 3 | `process-enrichment-queue`, `rsgp-compliance-generator`, `cleanup-old-emails` |
+| **Monitoring** | 1 | `run-system-tests` |
 
-📖 **[Voir l'architecture complète](./ARCHITECTURE.md)** pour diagrammes détaillés et workflows.
+**Total : 23 Edge Functions production-ready**
+
+📖 **[Voir l'architecture complète](./ARCHITECTURE.md)** pour les 124 fonctions documentées et workflows.
 
 ---
 
@@ -116,7 +134,7 @@
 - Compte Supabase (Lovable Cloud)
 - Comptes API optionnels (Amazon SP-API, OpenAI, Anthropic)
 
-### Installation
+### Installation Locale (Développement)
 
 ```bash
 # 1. Cloner le repository
@@ -136,7 +154,29 @@ cp .env.example .env
 
 # 4. Lancer le serveur de développement
 npm run dev
+
+# 5. Lancer les tests
+npm test
 ```
+
+### 🚀 Installation Production (Coolify - Recommandé)
+
+**Déploiement en 1 commande sur Hostinger KVM ou VPS :**
+
+```bash
+# Installation automatique avec Coolify
+sudo ./scripts/coolify-setup.sh
+```
+
+Ou suivez le guide complet : **[COOLIFY-QUICKSTART.md](./COOLIFY-QUICKSTART.md)**
+
+**Fonctionnalités Coolify incluses :**
+- ✅ Installation automatique
+- ✅ Configuration SSL/TLS (Let's Encrypt)
+- ✅ Health checks automatiques
+- ✅ Sauvegardes quotidiennes
+- ✅ Monitoring intégré
+- ✅ Rollback en 1 clic
 
 ### Configuration Supabase
 
@@ -329,13 +369,24 @@ FROM enrichment_queue
 GROUP BY status;
 ```
 
-### Composants Monitoring
+### Composants Principaux
 
+**Pages & Vues :**
+- **ProductDetailPage** : Détail produit complet avec tabs (Détails, Enrichissement, Exports)
+- **DashboardPage** : Vue d'ensemble avec analytics
+- **ImportedProductsPage** : Liste et gestion produits
+
+**Composants Fonctionnels :**
+- **BulkOperationsPanel** : Opérations groupées (6 types : export, enrichissement, prix, catégorie, suppression)
+- **CSVUploader** : Upload drag & drop avec prévisualisation temps réel
+- **AnalyticsCharts** : 6 types de graphiques (KPIs, distribution, timeline, etc.)
+- **ShopifyConfigForm** : Configuration Shopify avec test de connexion
+- **OdooConfigForm** : Configuration Odoo ERP avec validation
+
+**Monitoring :**
 - **ImportJobMonitor** : Suivi imports en temps réel
 - **EnrichmentProgressMonitor** : Progression enrichissement IA
-- **EmailProcessingMonitor** : Status emails IMAP
-- **AmazonLogs** : Logs détaillés Amazon SP-API
-- **SystemHealthDashboard** : Vue globale système
+- **SystemHealthDashboard** : Vue globale système avec health checks
 
 ---
 
@@ -382,11 +433,33 @@ Configuration dans `supabase/config.toml`
 
 ## 📚 Documentation Complète
 
-- 📖 **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Architecture détaillée avec diagrammes
+- 📖 **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Architecture détaillée avec diagrammes Mermaid
+- 🚀 **[COOLIFY-QUICKSTART.md](./COOLIFY-QUICKSTART.md)** - Déploiement Coolify en 5 minutes
 - 🔧 **[CONFIGURATION.md](./docs/CONFIGURATION.md)** - Guide de configuration avancée
-- 🚀 **[DEPLOYMENT.md](./docs/DEPLOYMENT.md)** - Guide de déploiement production
-- 🧪 **[TESTING.md](./docs/TESTING.md)** - Guide de tests automatisés
-- 🔌 **[API.md](./docs/API.md)** - Référence complète API Edge Functions
+- 📤 **[DEPLOYMENT.md](./docs/DEPLOYMENT.md)** - Guide de déploiement production
+- 🔄 **[MIGRATION.md](./docs/MIGRATION.md)** - Migration depuis autres systèmes
+- 🏥 **[COOLIFY-DEPLOYMENT.md](./docs/COOLIFY-DEPLOYMENT.md)** - Guide Coolify détaillé
+
+## 🧪 Tests & Qualité
+
+```bash
+# Lancer tous les tests
+npm test
+
+# Tests avec couverture
+npm run test:coverage
+
+# Tests UI (interface visuelle)
+npm run test:ui
+
+# Linter
+npm run lint
+```
+
+**70+ Tests Couvrant :**
+- ✅ Validation EAN (60+ tests) - EAN-13, EAN-8, UPC-A, pays, conversion
+- ✅ Composants React (10+ tests) - CSVUploader, Button, utilities
+- ✅ Utilities (5+ tests) - Formatage, validation, API wrappers
 
 ---
 
